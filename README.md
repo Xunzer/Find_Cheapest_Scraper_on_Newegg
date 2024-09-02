@@ -6,7 +6,9 @@
 - Python
 
 ### By applying:
-- BeautifulSoup4 library (for scraping)
+- BeautifulSoup4 (for scraping)
+- regex
+- requests (for HTTP Get)
 
 ### Saving example:
 ![saving_example](https://github.com/user-attachments/assets/3bc0d899-40e4-455d-b6ff-a91dbe3f5c3e)
