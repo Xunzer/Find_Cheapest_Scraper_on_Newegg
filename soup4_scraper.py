@@ -17,6 +17,16 @@ page_html = requests.get(my_url).text
 # parse the string as html and store it
 page_parsed = soup(page_html, "html.parser")
 
+# create a new .csv file to write in the data
+filename = "findcheapest.csv"
+f = open(filename, "w", encoding="utf-8")
+
+# first writing in the headers
+headers = "product_name, product_price, product_link\n" # .csv are delimited by newlines
+f.write(headers)
+
+possible_choice = {} # intiailize the dictionary to store the price and its name
+
 # <span class="list-tool-pagination-text">Page<!-- --> <strong>1<!-- -->/<!-- -->2</strong></span>
 # get the parent of max page number element and convert it to a string, then use split() twice on it and get everything remaining in the last item (so that the last "<" is removed)
 page_num_text = page_parsed.find(class_="list-tool-pagination-text").strong
@@ -40,6 +50,29 @@ for page in range(1, max_page + 1):
         link = i_parent["href"]
 
         i_grand_parent = item.find_parent(class_="item-container") # find the "item-container" tag which is the parent of "item-title" tag. find_parent will find the first matching parent in the tree
-        price = i_grand_parent.find(class_="price-current").strong.string # find the "price-current" which contains the price number and specify the tag name and access the value
+        price_tag = i_grand_parent.find(class_="price-current").strong # find the "price-current" which contains the price number and specify the tag name
+        if price_tag == None: # if there are some special deals, we might not be able to retrieve the tag from the html but get a None object instead
+            continue
+        price = price_tag.string # retrieve the value from tag
 
-        print(price)
+        possible_choice[item.replace(",", "")] = {"price": int(price.replace(",", "")), "link": link} # store the key-value pair inside the dictionary. Remove the commas from the price by calling replace() and convert it to an int
+        print(possible_choice)
+
+sorted_choice = sorted(possible_choice.items(), key=lambda x: x[1]["price"]) # we pass a lambda function into the sorted as the key, which is an anonymous function that takes a tuple and returns the value associated with the key "price" in the value dictionary, then the sorted() would sort the list of tuples based on the "price" values
+
+# for loop to process each eligible item in sorted dictionary
+for item in sorted_choice:
+    product_name = item[0]
+    product_price = f"${item[1]["price"]}"
+    product_link = item[1]["link"]
+
+    # print in terminal
+    print(product_name)
+    print(product_price)
+    print(product_link)
+    print("----------------------------------------------------------------------------------")
+
+    f.write(product_name + "," + product_price + "," + product_link + "\n") # write the data into the .csv file, already converted all in-text commas to None so that it wouldn't be treated as new columns
+
+# close the .csv file
+f.close()
