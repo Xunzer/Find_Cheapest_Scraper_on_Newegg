@@ -40,6 +40,6 @@ for page in range(1, max_page + 1):
         link = i_parent["href"]
 
         i_grand_parent = item.find_parent(class_="item-container") # find the "item-container" tag which is the parent of "item-title" tag. find_parent will find the first matching parent in the tree
-        price = i_grand_parent.find(class_="price-current") # find the "price-current" which contains the price number
+        price = i_grand_parent.find(class_="price-current").strong.string # find the "price-current" which contains the price number and specify the tag name and access the value
 
         print(price)
